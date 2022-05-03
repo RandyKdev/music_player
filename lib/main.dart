@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/screens/track_screen.dart';
+
 
 import 'package:music_player/screens/tracks/trackScreen.dart';
 
@@ -12,8 +14,13 @@ class MusicPlayerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-  
-      home: TrackScreen(),
+
+      debugShowCheckedModeBanner: false,
+      title: 'Music Player',
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+      ),
+      home: const TrackScreen(),
     );
   }
 }
