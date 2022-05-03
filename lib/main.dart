@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:music_player/screens/track_screen.dart';
 
 
+import 'package:music_player/screens/tracks/trackScreen.dart';
+
 void main() {
-  runApp(const MyApp());
+  runApp(const MusicPlayerApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MusicPlayerApp extends StatelessWidget {
+  const MusicPlayerApp({ Key? key }) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       debugShowCheckedModeBanner: false,
       title: 'Music Player',
       theme: ThemeData(
@@ -22,4 +24,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
