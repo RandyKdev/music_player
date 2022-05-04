@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:music_player/models/audio_player_model.dart';
 import 'package:music_player/models/song_model.dart';
-import 'package:music_player/screens/play_screen.dart';
 
 class MusicTile extends StatelessWidget {
   final SongModel song;
