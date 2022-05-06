@@ -12,8 +12,10 @@ class SongModel {
     this.imageBase64,
   });
 
-  factory SongModel.fromJson(
-      {required Map<String, dynamic>? json, required String path}) {
+  factory SongModel.fromJson({
+    required Map<String, dynamic>? json,
+    required String path,
+  }) {
     return SongModel(
       title: json?["Title"] ??
           path.substring(path.lastIndexOf('/') + 1, path.length - 4),

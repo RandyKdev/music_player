@@ -27,9 +27,16 @@ class _TrackScreenState extends State<TrackScreen> {
   }
 
   @override
+  void dispose() {
+    AudioPlayerModel.instance.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 80,
         title: const Text(
           'GDSC Music Player',
@@ -133,13 +140,14 @@ class _TrackScreenState extends State<TrackScreen> {
               stream: AudioPlayerModel.instance.index,
               builder: ((context, AsyncSnapshot<int?> snapshot) {
                 return InkWell(
-                  onTap: () async {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return PlayScreen(
-                          song: AudioPlayerModel
-                              .instance.songs![snapshot.data ?? 0]);
-                    }));
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return const PlayScreen();
+                      },
+                    );
                   },
                   child: Container(
                     padding: const EdgeInsets.all(15),
@@ -184,8 +192,13 @@ class _TrackScreenState extends State<TrackScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                AudioPlayerModel
-                                    .instance.songs![snapshot.data ?? 0].title,
+                                AudioPlayerModel.instance
+                                        .songs![snapshot.data ?? 0].title
+                                        .substring(0, 1)
+                                        .toUpperCase() +
+                                    AudioPlayerModel.instance
+                                        .songs![snapshot.data ?? 0].title
+                                        .substring(1),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white.withOpacity(.95),
@@ -195,8 +208,13 @@ class _TrackScreenState extends State<TrackScreen> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                AudioPlayerModel
-                                    .instance.songs![snapshot.data ?? 0].artist,
+                                AudioPlayerModel.instance
+                                        .songs![snapshot.data ?? 0].artist
+                                        .substring(0, 1)
+                                        .toUpperCase() +
+                                    AudioPlayerModel.instance
+                                        .songs![snapshot.data ?? 0].artist
+                                        .substring(1),
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(.95),
                                   fontSize: 11,
@@ -209,6 +227,9 @@ class _TrackScreenState extends State<TrackScreen> {
                         ),
                         const SizedBox(width: 10),
                         InkWell(
+                          onTap: () async {
+                            await AudioPlayerModel.instance.previous();
+                          },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Icon(

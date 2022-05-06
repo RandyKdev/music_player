@@ -70,13 +70,6 @@ class MusicTile extends StatelessWidget {
                 ],
               ),
             ),
-            // IconButton(
-            //   onPressed: () {},
-            //   icon: const Icon(
-            //     Icons.more_vert_rounded,
-            //     color: Colors.black54,
-            //   ),
-            // )
           ]),
         ));
   }

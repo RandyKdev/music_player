@@ -6,9 +6,10 @@ import 'package:music_player/utils/colors.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemNavigationBarColor: Colors.transparent, // navigation bar color
-    statusBarColor: Colors.transparent, // status bar color
+    systemNavigationBarColor: Colors.transparent,
+    statusBarColor: Colors.transparent,
   ));
+
   runApp(const MusicPlayerApp());
 }
 

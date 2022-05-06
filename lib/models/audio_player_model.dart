@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:id3/id3.dart';
 import 'package:just_audio/just_audio.dart';
@@ -13,8 +14,6 @@ class AudioPlayerModel {
   static final AudioPlayerModel instance = AudioPlayerModel._();
 
   Stream<bool> get playingState => _audioPlayer.playingStream;
-  Stream<ProcessingState> get processingStateStream =>
-      _audioPlayer.processingStateStream;
   ProcessingState get processingState => _audioPlayer.processingState;
   Stream<Duration> get positionState => _audioPlayer.positionStream;
   Duration? get duration => _audioPlayer.duration;
@@ -26,23 +25,10 @@ class AudioPlayerModel {
 
   List<SongModel>? songs;
 
-  Future<List<SongModel>> _getSongs(BuildContext ctx) async {
-    if (!await Permission.storage.isGranted) {
-      final perm = await Permission.storage.request();
-      if (!perm.isGranted) {
-        exit(0);
-      }
-    }
-
+  static Future<List<dynamic>> _getSongs(String path) async {
     List<SongModel> s = [];
 
-    Directory? mainDir = await getExternalStorageDirectory();
-    if (mainDir == null) {
-      exit(0);
-    }
-
-    Directory topDir =
-        Directory(mainDir.path.substring(0, mainDir.path.indexOf('Android')));
+    Directory topDir = Directory(path.substring(0, path.indexOf('Android')));
 
     Stream<FileSystemEntity> files = topDir.list(recursive: true);
     List<FileSystemEntity> filesList = await files.toList();
@@ -56,7 +42,6 @@ class AudioPlayerModel {
                   'm4a')) {
         bytes = File(element.path).readAsBytesSync();
         mp3instance = MP3Instance(bytes);
-        // if (mp3instance.parseTagsSync()) {
         mp3instance.parseTagsSync();
         s.add(
           SongModel.fromJson(
@@ -64,12 +49,15 @@ class AudioPlayerModel {
             path: element.path,
           ),
         );
-        // }
       }
     }
 
     s.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
-    return s;
+
+    List<UriAudioSource> songUris =
+        s.map((e) => AudioSource.uri(Uri.parse(e.path))).toList();
+
+    return [s, songUris];
   }
 
 // {
@@ -86,7 +74,21 @@ class AudioPlayerModel {
 // }
 
   Future<void> init(BuildContext ctx) async {
-    songs = await _getSongs(ctx);
+    if (!await Permission.storage.isGranted) {
+      final perm = await Permission.storage.request();
+      if (!perm.isGranted) {
+        exit(0);
+      }
+    }
+
+    Directory? mainDir = await getExternalStorageDirectory();
+    if (mainDir == null) {
+      exit(0);
+    }
+
+    List<dynamic> comp;
+    comp = await compute<String, List<dynamic>>(_getSongs, mainDir.path);
+    songs = comp[0] as List<SongModel>;
 
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.music());
@@ -99,18 +101,12 @@ class AudioPlayerModel {
       // Try to load audio from a source and catch any errors.
       await _audioPlayer.setAudioSource(
         ConcatenatingAudioSource(
-          // Start loading next item just before reaching it.
-          useLazyPreparation: true, // default
-          // Customise the shuffle algorithm.
-          shuffleOrder: DefaultShuffleOrder(), // default
-          // Specify the items in the playlist.
-          children:
-              songs!.map((e) => AudioSource.uri(Uri.parse(e.path))).toList(),
+          useLazyPreparation: true,
+          shuffleOrder: DefaultShuffleOrder(),
+          children: comp[1] as List<UriAudioSource>,
         ),
         initialIndex: null,
-        // Playback will be prepared to start from track1.mp3
-        // Playback will be prepared to start from position zero.
-        initialPosition: Duration.zero, // default
+        initialPosition: Duration.zero,
         preload: false,
       );
       _audioPlayer.setLoopMode(LoopMode.all);
@@ -128,7 +124,6 @@ class AudioPlayerModel {
     } else {
       await _audioPlayer.setLoopMode(LoopMode.all);
     }
-    // no looping (default)
   }
 
   Future<void> setShuffleMode(bool shuffleMode) async {

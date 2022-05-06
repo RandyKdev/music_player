@@ -3,48 +3,40 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_player/models/audio_player_model.dart';
-import 'package:music_player/models/song_model.dart';
 import 'package:music_player/utils/colors.dart';
 
 class PlayScreen extends StatelessWidget {
-  final SongModel song;
-  const PlayScreen({Key? key, required this.song}) : super(key: key);
+  const PlayScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldBackgroundColor,
       appBar: AppBar(
+        toolbarHeight: 110,
         elevation: 0,
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
           icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-            size: 20,
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.black54,
+            size: 35,
           ),
         ),
-        // actions: [
-        //   IconButton(
-        //       onPressed: () {},
-        //       icon: const Icon(
-        //         Icons.more_vert_rounded,
-        //         color: midColor,
-        //       ))
-        // ],
       ),
       body: Container(
         decoration: const BoxDecoration(
-            gradient: RadialGradient(
-          colors: [
-            primaryColor,
-            scaffoldBackgroundColor,
-          ],
-          center: Alignment(-.4, .9),
-          radius: 1.1,
-        )),
+          gradient: RadialGradient(
+            colors: [
+              primaryColor,
+              scaffoldBackgroundColor,
+            ],
+            center: Alignment(-.5, .9),
+            radius: 1.1,
+          ),
+        ),
         child: Column(
           children: [
             Expanded(
@@ -60,6 +52,7 @@ class PlayScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                             ),
+                            clipBehavior: Clip.hardEdge,
                             height: 150.0,
                             width: 150.0,
                             child: AudioPlayerModel
@@ -68,7 +61,8 @@ class PlayScreen extends StatelessWidget {
                                         .imageBase64 ==
                                     null
                                 ? Hero(
-                                    tag: song.title,
+                                    tag: AudioPlayerModel.instance
+                                        .songs![snapshot.data ?? 0].title,
                                     child: Image.asset(
                                       'assets/icon.png',
                                       height: 150,
@@ -76,7 +70,8 @@ class PlayScreen extends StatelessWidget {
                                     ),
                                   )
                                 : Hero(
-                                    tag: song.title,
+                                    tag: AudioPlayerModel.instance
+                                        .songs![snapshot.data ?? 0].title,
                                     child: Image.memory(
                                       base64Decode(AudioPlayerModel
                                           .instance
@@ -93,8 +88,15 @@ class PlayScreen extends StatelessWidget {
                               top: 20.0, left: 10.0, right: 10.0),
                           child: Text(
                             AudioPlayerModel
-                                .instance.songs![snapshot.data ?? 0].title,
+                                    .instance.songs![snapshot.data ?? 0].title
+                                    .substring(0, 1)
+                                    .toUpperCase() +
+                                AudioPlayerModel
+                                    .instance.songs![snapshot.data ?? 0].title
+                                    .substring(1),
                             textAlign: TextAlign.center,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.normal,
@@ -106,8 +108,15 @@ class PlayScreen extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 5.0),
                           child: Text(
                             AudioPlayerModel
-                                .instance.songs![snapshot.data ?? 0].artist,
+                                    .instance.songs![snapshot.data ?? 0].artist
+                                    .substring(0, 1)
+                                    .toUpperCase() +
+                                AudioPlayerModel
+                                    .instance.songs![snapshot.data ?? 0].artist
+                                    .substring(1),
                             textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.black45,
                               fontWeight: FontWeight.bold,
@@ -129,7 +138,7 @@ class PlayScreen extends StatelessWidget {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(
-                              top: 20, left: 10.0, right: 10.0, bottom: 0),
+                              top: 20, left: 5.0, right: 5.0, bottom: 0),
                           child: Slider.adaptive(
                             value: snapshot.hasData
                                 ? snapshot.data!.inSeconds.toDouble()
@@ -146,9 +155,9 @@ class PlayScreen extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(
-                              top: 0, left: 35.0, right: 35.0),
+                              top: 0, left: 28.0, right: 28.0),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 snapshot.hasData
@@ -162,6 +171,24 @@ class PlayScreen extends StatelessWidget {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.normal,
                                   color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                AudioPlayerModel.instance.duration != null
+                                    ? AudioPlayerModel.instance.duration
+                                        .toString()
+                                        .substring(
+                                          0,
+                                          AudioPlayerModel.instance.duration
+                                              .toString()
+                                              .indexOf('.'),
+                                        )
+                                    : '00:00',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white,
+                                  fontSize: 12,
                                 ),
                               )
                             ],
@@ -176,7 +203,7 @@ class PlayScreen extends StatelessWidget {
                     top: 10.0,
                     left: 20.0,
                     right: 20.0,
-                    bottom: 70,
+                    bottom: 30,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,7 +218,7 @@ class PlayScreen extends StatelessWidget {
                                 padding: EdgeInsets.all(8.0),
                                 child: Icon(
                                   Icons.shuffle_on_outlined,
-                                  size: 30,
+                                  size: 25,
                                   color: Colors.white,
                                 ),
                               ),
@@ -206,7 +233,7 @@ class PlayScreen extends StatelessWidget {
                               padding: EdgeInsets.all(8.0),
                               child: Icon(
                                 Icons.shuffle_outlined,
-                                size: 30,
+                                size: 25,
                                 color: Colors.white,
                               ),
                             ),
@@ -226,6 +253,9 @@ class PlayScreen extends StatelessWidget {
                             color: Colors.white.withOpacity(.95),
                           ),
                         ),
+                        onTap: () async {
+                          await AudioPlayerModel.instance.previous();
+                        },
                       ),
                       StreamBuilder(
                           stream: AudioPlayerModel.instance.playingState,
@@ -237,7 +267,7 @@ class PlayScreen extends StatelessWidget {
                                   snapshot1.data != null && snapshot1.data!
                                       ? Icons.pause_rounded
                                       : Icons.play_arrow_rounded,
-                                  size: 40,
+                                  size: 45,
                                   color: Colors.white.withOpacity(.95),
                                 ),
                               ),
@@ -272,7 +302,7 @@ class PlayScreen extends StatelessWidget {
                                 padding: EdgeInsets.all(8.0),
                                 child: Icon(
                                   Icons.repeat_on_rounded,
-                                  size: 30,
+                                  size: 25,
                                   color: Colors.white,
                                 ),
                               ),
@@ -289,7 +319,7 @@ class PlayScreen extends StatelessWidget {
                                 padding: EdgeInsets.all(8.0),
                                 child: Icon(
                                   Icons.repeat_one_on_rounded,
-                                  size: 30,
+                                  size: 25,
                                   color: Colors.white,
                                 ),
                               ),
@@ -305,7 +335,7 @@ class PlayScreen extends StatelessWidget {
                               padding: EdgeInsets.all(8.0),
                               child: Icon(
                                 Icons.repeat_rounded,
-                                size: 30,
+                                size: 25,
                                 color: Colors.white,
                               ),
                             ),
