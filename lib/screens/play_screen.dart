@@ -148,6 +148,12 @@ class PlayScreen extends StatelessWidget {
                             max: AudioPlayerModel.instance.duration?.inSeconds
                                     .toDouble() ??
                                 0.toDouble(),
+                            onChangeEnd: (double _) {
+                              AudioPlayerModel.instance.changeSeeking(false);
+                            },
+                            onChangeStart: (double _) {
+                              AudioPlayerModel.instance.changeSeeking(true);
+                            },
                             onChanged: (value) async {
                               await AudioPlayerModel.instance.seek(value);
                             },

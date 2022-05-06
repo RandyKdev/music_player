@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
@@ -15,11 +16,27 @@ class AudioPlayerModel {
 
   Stream<bool> get playingState => _audioPlayer.playingStream;
   ProcessingState get processingState => _audioPlayer.processingState;
-  Stream<Duration> get positionState => _audioPlayer.positionStream;
+  Stream<Duration> get positionState => positionStream();
   Duration? get duration => _audioPlayer.duration;
   Stream<int?> get index => _audioPlayer.currentIndexStream;
   Stream<LoopMode> get loopMode => _audioPlayer.loopModeStream;
   Stream<bool> get shuffleMode => _audioPlayer.shuffleModeEnabledStream;
+
+  Stream<Duration> positionStream() async* {
+    DateTime n = DateTime.now();
+    DateTime n1 = DateTime.now();
+    await for (final v in _audioPlayer.positionStream) {
+      n1 = DateTime.now();
+      if (seeking) {
+        yield v;
+      } else if (n1.difference(n).inSeconds >= 1) {
+        n = n1;
+        yield v;
+      }
+    }
+  }
+
+  bool seeking = false;
 
   final _audioPlayer = AudioPlayer();
 
@@ -158,6 +175,10 @@ class AudioPlayerModel {
 
   Future<void> stop() async {
     await _audioPlayer.stop();
+  }
+
+  void changeSeeking(bool b) {
+    seeking = b;
   }
 
   Future<void> seek(double pos) async {
