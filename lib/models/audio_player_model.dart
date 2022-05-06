@@ -42,6 +42,24 @@ class AudioPlayerModel {
 
   List<SongModel>? songs;
 
+  static SongModel _getSongFromJson(String path) {
+    List<int> bytes;
+    MP3Instance mp3instance;
+    Map<String, dynamic>? json;
+
+    bytes = File(path).readAsBytesSync();
+    mp3instance = MP3Instance(bytes);
+    try {
+      if (mp3instance.parseTagsSync()) {
+        json = mp3instance.getMetaTags();
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+
+    return SongModel.fromJson(path: path, json: json);
+  }
+
   static Future<List<dynamic>> _getSongs(String path) async {
     List<SongModel> s = [];
 
@@ -49,23 +67,12 @@ class AudioPlayerModel {
 
     Stream<FileSystemEntity> files = topDir.list(recursive: true);
     List<FileSystemEntity> filesList = await files.toList();
-    List<int> bytes;
-    MP3Instance mp3instance;
+
+    String e1;
     for (var element in filesList) {
-      if (element is File &&
-          (element.path.substring(element.path.length - 3).toLowerCase() ==
-                  'mp3' ||
-              element.path.substring(element.path.length - 3).toLowerCase() ==
-                  'm4a')) {
-        bytes = File(element.path).readAsBytesSync();
-        mp3instance = MP3Instance(bytes);
-        mp3instance.parseTagsSync();
-        s.add(
-          SongModel.fromJson(
-            json: mp3instance.getMetaTags(),
-            path: element.path,
-          ),
-        );
+      e1 = element.path.substring(element.path.length - 3).toLowerCase();
+      if (element is File && (e1 == 'mp3' || e1 == 'm4a')) {
+        s.add(await compute<String, SongModel>(_getSongFromJson, element.path));
       }
     }
 

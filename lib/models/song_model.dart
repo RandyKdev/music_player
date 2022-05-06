@@ -13,15 +13,21 @@ class SongModel {
   });
 
   factory SongModel.fromJson({
-    required Map<String, dynamic>? json,
+    Map<String, dynamic>? json,
     required String path,
   }) {
-    return SongModel(
+    SongModel s = SongModel(
       title: json?["Title"] ??
           path.substring(path.lastIndexOf('/') + 1, path.length - 4),
-      artist: json?["Artist"] ?? 'Unknown',
+      artist: json?["Artist"] ?? "Unknown",
       path: path,
       imageBase64: json?["APIC"]?["base64"],
     );
+    if (s.imageBase64?.trim() == '') s.imageBase64 = null;
+    if (s.title.trim() == '') {
+      s.title = path.substring(path.lastIndexOf('/') + 1, path.length - 4);
+    }
+    if (s.artist.trim() == '') s.artist = "Unknown";
+    return s;
   }
 }

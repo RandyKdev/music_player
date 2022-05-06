@@ -8,8 +8,10 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     systemNavigationBarColor: Colors.transparent,
     statusBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    statusBarIconBrightness: Brightness.dark,
   ));
-
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MusicPlayerApp());
 }
 

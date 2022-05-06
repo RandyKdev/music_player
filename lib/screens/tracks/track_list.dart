@@ -13,13 +13,9 @@ class TrackList extends StatelessWidget {
         if (index == AudioPlayerModel.instance.songs!.length) {
           return const SizedBox(height: 100);
         }
-        return Column(
-          children: [
-            MusicTile(
-              song: AudioPlayerModel.instance.songs![index],
-              index: index,
-            ),
-          ],
+        return MusicTile(
+          song: AudioPlayerModel.instance.songs![index],
+          index: index,
         );
       },
       separatorBuilder: (context, index) {

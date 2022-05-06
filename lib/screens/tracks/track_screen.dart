@@ -123,7 +123,11 @@ class _TrackScreenState extends State<TrackScreen> {
             ? const Center(
                 child: CircularProgressIndicator(color: primaryColor),
               )
-            : const TrackList(),
+            : AudioPlayerModel.instance.songs!.isEmpty
+                ? const Center(
+                    child: Text("You have no audio files"),
+                  )
+                : const TrackList(),
         clipBehavior: Clip.hardEdge,
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -134,7 +138,8 @@ class _TrackScreenState extends State<TrackScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: AudioPlayerModel.instance.songs == null
+      floatingActionButton: AudioPlayerModel.instance.songs == null ||
+              AudioPlayerModel.instance.songs!.isEmpty
           ? null
           : StreamBuilder(
               stream: AudioPlayerModel.instance.index,
